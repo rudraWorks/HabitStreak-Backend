@@ -39,14 +39,43 @@ export const addHabit = async (req,res) => {
 export const myHabits = async (req,res) => {
     try{
         const email = req.email 
-        const habit = (await Habits.findOne({email},{_id:0,email:0})).habits
-        console.log(habit);
+        let habit = (await Habits.findOne({email},{_id:0,email:0}))
+        
+        if(!habit)
+            return res.status(200).json({message:[]})
+        
+        habit = habit.habits
+        // console.log(habit); 
         const arr = habit.map((h)=>{
             return {name:h.name,emoji:h.emoji}
         })
         return res.status(200).json({message:arr})
     }
     catch(e){
+        return res.status(400).json({message:e.message})
+    }
+}
+
+export const habitDetails = async (req,res) => {
+    try{
+        const email = req.email 
+        let {habitName} = req.query 
+        habitName = habitName.trim()
+
+        console.log(email,habitName)
+
+        const habit = await Habits.findOne({
+            email: email,
+            'habits.name': habitName
+        }, {
+            'habits.$': 1
+        }).exec();
+
+        // console.log(habit); 
+        return res.status(200).json({message:habit})
+    }
+    catch(e){
+        console.log(e);
         return res.status(400).json({message:e.message})
     }
 }
