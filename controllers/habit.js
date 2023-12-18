@@ -71,11 +71,119 @@ export const habitDetails = async (req,res) => {
             'habits.$': 1
         }).exec();
 
+        if(!habit)
+            return res.status(404).json({message:'Not found'})
         // console.log(habit); 
-        return res.status(200).json({message:habit})
+        const habitObj = habit.habits[0]
+        return res.status(200).json({emoji:habitObj.emoji,type:habitObj.type,calendar:habitObj.calendar})
     }
     catch(e){
         console.log(e);
+        return res.status(400).json({message:e.message})
+    }
+}
+
+export const today = async (req,res) => {
+    try{
+        const email = req.email 
+        let {type,epoch,value,habit} = req.body 
+
+        console.log(email,type,habit,epoch,value)
+
+        if(!epoch || value<0)
+            return res.status(400).json({message:'Invalid input'})
+
+        let p = await Habits.findOne(
+            { email, 'habits.name': habit },
+            { 'habits.calendar.$': 1 }
+        )
+        // console.log(p)
+        p = p.habits[0].calendar
+        let flag=0
+        for(let i=0;i<p.length;++i)
+            if(p[i].epoch === epoch)
+                flag=1 
+        if(!flag){
+            await Habits.updateOne(
+                { email, 'habits.name': habit },
+                { $addToSet: { 'habits.$[elem].calendar': {epoch , value} } },
+                { arrayFilters: [{ 'elem.name': habit }] }
+            );
+        }
+
+        else{
+            await Habits.updateOne(
+                { email, 'habits.name': habit, 'habits.calendar.epoch': epoch },
+                { $set: { 'habits.$.calendar.$[entry].value': value } },
+                { arrayFilters: [{ 'entry.epoch': epoch }] }
+            );
+        }
+       
+        console.log(p)
+        return res.json({message:p})
+    }
+    catch(e){
+        return res.status(400).json({message:e.message})
+    }
+}
+
+export const updateEmoji = async (req,res) => {
+    try{
+        const email = req.email 
+        const {habit,emoji} = req.body 
+        console.log(habit,emoji)
+        const response = await Habits.updateOne(
+            { email: email, 'habits.name': habit },
+            { $set: { 'habits.$.emoji': emoji } }
+        )
+        
+        return res.status(200).json({message:'Theme updated successfully'})
+    }
+    catch(e){
+        return res.status(400).json({message:e.message})
+    }
+}
+
+export const renameHabit = async (req,res) => {
+    try{
+        const email = req.email 
+        const {habit,newHabit} = req.body 
+
+        if(!newHabit)
+            return res.status(400).json({message:'Invalid input'})
+
+        const checkIfAlreadyPresent = await Habits.exists(
+            {email,'habits.name':newHabit}
+        )
+        console.log(checkIfAlreadyPresent);
+        if(checkIfAlreadyPresent)
+            return res.status(400).json({message:'This habit already exists'})
+
+        const response = await Habits.updateOne(
+            { email, 'habits.name': habit },
+            { $set: { 'habits.$.name': newHabit } }
+        )
+        return res.status(200).json({message:newHabit})
+    }
+    catch(e){
+        return res.status(400).json({message:e.message})
+    }
+}
+
+export const deleteHabit = async (req,res) => {
+    try{
+        const email = req.email 
+        const {habit} = req.body 
+
+
+        const response = await Habits.updateOne(
+            { email },
+            { $pull: { habits: { name: habit } } }
+        );
+
+        return res.status(200).json({message:'Successfully deleted'})
+    }
+    catch(e){
         return res.status(400).json({message:e.message})
     }
 }

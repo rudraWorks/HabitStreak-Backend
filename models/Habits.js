@@ -3,7 +3,8 @@ import { Schema, model } from "mongoose";
 const calendar = Schema({
     epoch:{
         type:Number,
-        required:true
+        required:true,
+        unique:true
     },
     value:{
         type:Number,
