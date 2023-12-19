@@ -3,9 +3,9 @@ import Habits from "../models/Habits.js";
 export const addHabit = async (req,res) => {
     try{
         let {habitName : name,habitType : type, habitEmoji : emoji} = req.body 
-        name = name.trim()
+        name = name.trim().toLowerCase()
         type = type.trim()
-
+    
         if(!name || !type)
             return res.status(400).json({message:"Invalid inputs"})
         if(type!=='Integer' && type!=='Binary')
@@ -14,24 +14,81 @@ export const addHabit = async (req,res) => {
             return res.status(400).json({message:"Habit name is too long"})
 
         const email = req.email
+        console.log(email)
+
+        const check_if_habit_already_exists = await Habits.exists({email,"habits.name":name})
+
+        if(check_if_habit_already_exists)
+            return res.status(400).json({message:'You have already created a habit with the same name.'})
 
         const response = await Habits.updateOne(
-            { email, 'habits.name': { $ne: name } },
-            { $addToSet: { habits: { name, type, emoji } } },
+            { email},
+            { $push: { habits: { name, type, emoji } } },
             {
-                upsert: true,
-                new: true 
+                upsert: true
             }
         );
 
+        // const getUser = await Habits.findOne({email})
+        // if(!getUser)
+            
+        // const habitsArr = [...getUser.habits,{name,type,emoji,creationDate:Date.now(),calendar:[]}]
+        // await Habits.updateOne(
+        //     {email},
+        //     {$set:{habits:habitsArr}}
+        // )
 
-        console.log(response);
+        console.log('hi');
+        // console.log(response);
 
         return res.status(200).json({message:'Habit created successfully.'})
     }
     catch(e){
-        if(e.message.includes('E11000'))
-            return res.status(400).json({message:'You have already created a habit with the same name.'})
+        return res.status(400).json({message:e.message})
+    }
+}
+
+export const today = async (req,res) => {
+    try{
+        const email = req.email 
+        let {type,epoch,value,habit} = req.body 
+
+
+        console.log(email,type,habit,epoch,value)
+
+        if(!epoch || value<0 || value===NaN || value===null)
+            return res.status(400).json({message:'Invalid input'})
+
+        let p = await Habits.findOne(
+            { email, 'habits.name': habit },
+            { 'habits.calendar.$': 1 }
+        )
+        console.log(p)
+        p = p.habits[0].calendar
+        let flag=0
+        for(let i=0;i<p.length;++i)
+            if(p[i].epoch === epoch)
+                flag=1 
+        if(!flag){
+            await Habits.updateOne(
+                { email, 'habits.name': habit },
+                { $addToSet: { 'habits.$[elem].calendar': {epoch , value} } },
+                { arrayFilters: [{ 'elem.name': habit }] }
+            );
+        }
+
+        else{
+            await Habits.updateOne(
+                { email, 'habits.name': habit, 'habits.calendar.epoch': epoch },
+                { $set: { 'habits.$.calendar.$[entry].value': value } },
+                { arrayFilters: [{ 'entry.epoch': epoch }] }
+            );
+        }
+       
+        // console.log(p)
+        return res.json({message:p})
+    }
+    catch(e){
         return res.status(400).json({message:e.message})
     }
 }
@@ -47,7 +104,7 @@ export const myHabits = async (req,res) => {
         habit = habit.habits
         // console.log(habit); 
         const arr = habit.map((h)=>{
-            return {name:h.name,emoji:h.emoji}
+            return {name:h.name,emoji:h.emoji,calendar:h.calendar}
         })
         return res.status(200).json({message:arr})
     }
@@ -83,49 +140,7 @@ export const habitDetails = async (req,res) => {
     }
 }
 
-export const today = async (req,res) => {
-    try{
-        const email = req.email 
-        let {type,epoch,value,habit} = req.body 
 
-        console.log(email,type,habit,epoch,value)
-
-        if(!epoch || value<0)
-            return res.status(400).json({message:'Invalid input'})
-
-        let p = await Habits.findOne(
-            { email, 'habits.name': habit },
-            { 'habits.calendar.$': 1 }
-        )
-        // console.log(p)
-        p = p.habits[0].calendar
-        let flag=0
-        for(let i=0;i<p.length;++i)
-            if(p[i].epoch === epoch)
-                flag=1 
-        if(!flag){
-            await Habits.updateOne(
-                { email, 'habits.name': habit },
-                { $addToSet: { 'habits.$[elem].calendar': {epoch , value} } },
-                { arrayFilters: [{ 'elem.name': habit }] }
-            );
-        }
-
-        else{
-            await Habits.updateOne(
-                { email, 'habits.name': habit, 'habits.calendar.epoch': epoch },
-                { $set: { 'habits.$.calendar.$[entry].value': value } },
-                { arrayFilters: [{ 'entry.epoch': epoch }] }
-            );
-        }
-       
-        console.log(p)
-        return res.json({message:p})
-    }
-    catch(e){
-        return res.status(400).json({message:e.message})
-    }
-}
 
 export const updateEmoji = async (req,res) => {
     try{
@@ -147,11 +162,14 @@ export const updateEmoji = async (req,res) => {
 export const renameHabit = async (req,res) => {
     try{
         const email = req.email 
-        const {habit,newHabit} = req.body 
+        let {habit,newHabit} = req.body  
+
+        newHabit = newHabit.trim()   
 
         if(!newHabit)
             return res.status(400).json({message:'Invalid input'})
-
+        if(newHabit.length>25)
+            return res.status(400).json({message:'Habit name must be less than 25 chars'})
         const checkIfAlreadyPresent = await Habits.exists(
             {email,'habits.name':newHabit}
         )

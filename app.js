@@ -20,9 +20,9 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Logging middleware
 app.use((req, res, next) => {
   console.log(req.path, req.method);
-  setTimeout(() => { 
+  // setTimeout(() => { 
     next(); 
-  }, 200); 
+  // }, 200); 
 }); 
 
 

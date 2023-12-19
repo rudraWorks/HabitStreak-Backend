@@ -1,22 +1,28 @@
 import { Schema, model } from "mongoose";
 
 const calendar = Schema({
-    epoch:{
-        type:Number,
-        required:true,
-        unique:true
-    },
-    value:{
-        type:Number,
+    // _id: {
+    //     type: Schema.Types.ObjectId,
+    //     default: () => new mongoose.Types.ObjectId(),
+    // },   
+    epoch:{  
+        type:Number,  
+        required:true,  
+    }, 
+    value:{  
+        type:Number, 
         min:[0,"Invalid input"]
     }
 })
 
 const habit = Schema({
+    // _id: {
+    //     type: Schema.Types.ObjectId,
+    //     default: () => new mongoose.Types.ObjectId(),
+    // },
     name:{
         type:String,
         required:true,
-        unique:true,
         lowercase:true,
     },
     type:{
