@@ -104,7 +104,7 @@ export const myHabits = async (req,res) => {
         habit = habit.habits
         // console.log(habit); 
         const arr = habit.map((h)=>{
-            return {name:h.name,emoji:h.emoji,calendar:h.calendar}
+            return {name:h.name,emoji:h.emoji,calendar:h.calendar,archived:h.archived}
         })
         return res.status(200).json({message:arr})
     }
@@ -132,9 +132,9 @@ export const habitDetails = async (req,res) => {
             return res.status(404).json({message:'Not found'})
         // console.log(habit); 
         const habitObj = habit.habits[0]
-        return res.status(200).json({emoji:habitObj.emoji,type:habitObj.type,calendar:habitObj.calendar})
+        return res.status(200).json({emoji:habitObj.emoji,type:habitObj.type,calendar:habitObj.calendar,archived:habitObj.archived})
     }
-    catch(e){
+    catch(e){ 
         console.log(e);
         return res.status(400).json({message:e.message})
     }
@@ -200,6 +200,30 @@ export const deleteHabit = async (req,res) => {
         );
 
         return res.status(200).json({message:'Successfully deleted'})
+    }
+    catch(e){
+        return res.status(400).json({message:e.message})
+    }
+}
+
+
+export const archiveHabit = async (req,res) => {
+    try{
+        const email = req.email 
+        const {habit} = req.body 
+        const response = await Habits.updateOne(
+            {
+              email,
+              'habits.name': habit,
+            },
+            {
+              $mul: {
+                'habits.$.archived': -1,
+              },
+            }
+          )
+        console.log(response)
+        return res.status(200).json({message:'Operation successful'})
     }
     catch(e){
         return res.status(400).json({message:e.message})

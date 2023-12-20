@@ -18,6 +18,10 @@ const userSchema = Schema({
         type: Date,
         default: Date.now,
         required: true,
+    },
+    premium:{
+        type:Boolean,
+        default:false
     }
 })
 

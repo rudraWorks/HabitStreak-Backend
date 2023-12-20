@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addHabit , myHabits, habitDetails, today, updateEmoji, renameHabit, deleteHabit} from "../controllers/habit.js";
+import { addHabit , myHabits, habitDetails, today, updateEmoji, renameHabit, deleteHabit, archiveHabit} from "../controllers/habit.js";
 import checkUser from "../middlewares/checkUser.js";
 
 const router = Router()
@@ -11,5 +11,6 @@ router.put('/today',checkUser,today)
 router.put('/updateEmoji',checkUser,updateEmoji)
 router.put('/renameHabit',checkUser,renameHabit)
 router.delete('/deleteHabit',checkUser,deleteHabit)
+router.put('/archiveHabit',checkUser,archiveHabit)
 
 export default router   

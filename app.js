@@ -3,6 +3,9 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import * as dotenv from 'dotenv';
 
+import Users from './models/Users.js';
+import Habits from './models/Habits.js';
+
 // routes
 import authRoutes from './routes/auth.js'
 import habitRoutes from './routes/habit.js'
@@ -45,6 +48,17 @@ const connectDB = async () => {
   } 
 }; 
 
+const temp = async () => {
+  const t = await Habits.updateMany(
+    {},
+    { $set: { 'habits.$[].archived': -1 } },
+    {multi:true}
+  )
+  // const t = await Users.find({})
+  console.log(t); 
+} 
+ 
+// temp() 
 // Start server after connecting to the database
 connectDB().then(() => {
   app.listen(port, () => {

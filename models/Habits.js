@@ -41,6 +41,10 @@ const habit = Schema({
     },
     calendar:{
         type:[calendar]
+    },
+    archived:{ 
+        type:Number, 
+        default:-1
     }
 })
 
