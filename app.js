@@ -49,9 +49,9 @@ const connectDB = async () => {
 }; 
 
 const temp = async () => {
-  const t = await Habits.updateMany(
+  const t = await Users.updateMany(
     {},
-    { $set: { 'habits.$[].archived': -1 } },
+    { $unset: { premium : 1 } },
     {multi:true}
   )
   // const t = await Users.find({})

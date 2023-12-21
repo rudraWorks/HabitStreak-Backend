@@ -19,7 +19,7 @@ const userSchema = Schema({
         default: Date.now,
         required: true,
     },
-    premium:{
+    pro:{
         type:Boolean,
         default:false
     }
