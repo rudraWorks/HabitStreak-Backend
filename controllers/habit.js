@@ -128,13 +128,13 @@ export const habitDetails = async (req,res) => {
             'habits.$': 1
         }).exec();
 
-        if(!habit)
+        if(!habit) 
             return res.status(404).json({message:'Not found'})
         // console.log(habit); 
         const habitObj = habit.habits[0]
         return res.status(200).json({emoji:habitObj.emoji,type:habitObj.type,calendar:habitObj.calendar,archived:habitObj.archived})
     }
-    catch(e){ 
+    catch(e){  
         console.log(e);
         return res.status(400).json({message:e.message})
     }
