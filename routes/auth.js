@@ -1,10 +1,13 @@
 import { Router } from "express";
 
-import {login,verifyToken} from '../controllers/auth.js'
+import {activate, checkout, login,verifyToken} from '../controllers/auth.js'
+import checkUser from "../middlewares/checkUser.js";
 
 const router = Router()
 
 router.post('/login',login)
-router.get('/verifyToken',verifyToken)
+router.get('/verifyToken',verifyToken) 
+router.post('/checkout',checkout)
+router.get('/activate/:_id',activate)
 
 export default router  

@@ -1,4 +1,5 @@
 import Habits from "../models/Habits.js";
+import Users from "../models/Users.js";
 
 export const addHabit = async (req,res) => {
     try{
@@ -14,13 +15,27 @@ export const addHabit = async (req,res) => {
             return res.status(400).json({message:"Habit name is too long"})
 
         const email = req.email
-        console.log(email)
+
 
         const check_if_habit_already_exists = await Habits.exists({email,"habits.name":name})
 
         if(check_if_habit_already_exists)
             return res.status(400).json({message:'You have already created a habit with the same name.'})
-
+        
+        const check_the_number_of_habits_the_user_already_have = await Habits.aggregate([
+                { $match: { email } },
+                { $project: { numberOfHabits: { $size: '$habits' } } }
+              ]);
+          
+        if (check_the_number_of_habits_the_user_already_have.length > 0) {
+                const numberOfHabits = check_the_number_of_habits_the_user_already_have[0].numberOfHabits;
+                if(numberOfHabits===3){
+                    const user = await Users.findOne({ email }, { pro: 1 })
+                    if(user?.pro===false)
+                        return res.status(400).json({message:'Upgrade to PRO for creating more than 3 habits'})
+                } 
+        } 
+ 
         const response = await Habits.updateOne(
             { email},
             { $push: { habits: { name, type, emoji } } },

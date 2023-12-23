@@ -51,7 +51,7 @@ const connectDB = async () => {
 const temp = async () => {
   const t = await Users.updateMany(
     {},
-    { $unset: { premium : 1 } },
+    { $set: { pro : false } },
     {multi:true}
   )
   // const t = await Users.find({})
