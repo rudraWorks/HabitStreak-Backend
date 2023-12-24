@@ -53,7 +53,7 @@ export const addHabit = async (req,res) => {
         //     {$set:{habits:habitsArr}}
         // )
 
-        console.log('hi');
+        // console.log('hi');
         // console.log(response);
 
         return res.status(200).json({message:'Habit created successfully.'})
@@ -69,7 +69,7 @@ export const today = async (req,res) => {
         let {type,epoch,value,habit} = req.body 
 
 
-        console.log(email,type,habit,epoch,value)
+        // console.log(email,type,habit,epoch,value)
 
         if(!epoch || value<0 || value===NaN || value===null)
             return res.status(400).json({message:'Invalid input'})
@@ -78,7 +78,7 @@ export const today = async (req,res) => {
             { email, 'habits.name': habit },
             { 'habits.calendar.$': 1 }
         )
-        console.log(p)
+        // console.log(p)
         p = p.habits[0].calendar
         let flag=0
         for(let i=0;i<p.length;++i)
@@ -134,7 +134,7 @@ export const habitDetails = async (req,res) => {
         let {habitName} = req.query 
         habitName = habitName.trim()
 
-        console.log(email,habitName)
+        // console.log(email,habitName)
 
         const habit = await Habits.findOne({
             email: email,
@@ -147,10 +147,11 @@ export const habitDetails = async (req,res) => {
             return res.status(404).json({message:'Not found'})
         // console.log(habit); 
         const habitObj = habit.habits[0]
-        return res.status(200).json({emoji:habitObj.emoji,type:habitObj.type,calendar:habitObj.calendar,archived:habitObj.archived})
+        // console.log(habitObj.calendar.length);
+        return res.status(200).json({emoji:habitObj.emoji,type:habitObj.type,calendar:habitObj.calendar.map((item)=>{return {epoch:item.epoch,value:item.value}}),archived:habitObj.archived})
     }
     catch(e){  
-        console.log(e);
+        // console.log(e);
         return res.status(400).json({message:e.message})
     }
 }
@@ -161,7 +162,7 @@ export const updateEmoji = async (req,res) => {
     try{
         const email = req.email 
         const {habit,emoji} = req.body 
-        console.log(habit,emoji)
+        // console.log(habit,emoji)
         const response = await Habits.updateOne(
             { email: email, 'habits.name': habit },
             { $set: { 'habits.$.emoji': emoji } }
@@ -188,7 +189,7 @@ export const renameHabit = async (req,res) => {
         const checkIfAlreadyPresent = await Habits.exists(
             {email,'habits.name':newHabit}
         )
-        console.log(checkIfAlreadyPresent);
+        // console.log(checkIfAlreadyPresent);
         if(checkIfAlreadyPresent)
             return res.status(400).json({message:'This habit already exists'})
 
@@ -237,7 +238,7 @@ export const archiveHabit = async (req,res) => {
               },
             }
           )
-        console.log(response)
+        // console.log(response)
         return res.status(200).json({message:'Operation successful'})
     }
     catch(e){

@@ -24,13 +24,13 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use((req, res, next) => {
   console.log(req.path, req.method);
   // setTimeout(() => { 
-    next(); 
+  next();
   // }, 200); 
-}); 
+});
 
 
-app.use('/auth',authRoutes)
-app.use('/habit',habitRoutes)
+app.use('/auth', authRoutes)
+app.use('/habit', habitRoutes)
 
 // 404 handler
 app.get('*', (req, res) => {
@@ -41,23 +41,47 @@ const connectDB = async () => {
   try {
     mongoose.set('strictQuery', true);
     await mongoose.connect(process.env.DATABASE);
-    console.log('Connected to the database');  
+    console.log('Connected to the database');
   } catch (error) {
     console.error(error);
     process.exit(1);
-  } 
-}; 
+  }
+};
 
 const temp = async () => {
-  const t = await Users.updateMany(
-    {},
-    { $set: { pro : false } },
-    {multi:true}
-  )
+  let epoch = new Date('11/02/2023').getTime()
+  for (let i = 1; i <= 3; ++i) {
+    const t = await Habits.updateOne(
+      { email:'srudra754@gmail.com', 'habits.name': 'read book' },
+      { $addToSet: { 'habits.$[elem].calendar': { epoch, value:generateRandom(0,8) } } },
+      { arrayFilters: [{ 'elem.name': 'read book' }] }
+    );
+    epoch+=1000*60*60*24
+      console.log(new Date(epoch))
+  }
   // const t = await Users.find({})
-  console.log(t); 
-} 
+  // console.log(t);
+  console.log('done');
+}
+// temp()
  
+function generateRandom(min = 0, max = 100) {
+
+  // find diff
+  let difference = max - min;
+
+  // generate random number 
+  let rand = Math.random();
+
+  // multiply with difference 
+  rand = Math.floor( rand * difference);
+
+  // add with min value 
+  rand = rand + min;
+
+  return rand;
+}
+
 // temp() 
 // Start server after connecting to the database
 connectDB().then(() => {
@@ -65,5 +89,5 @@ connectDB().then(() => {
     console.log(`Server is running on port ${port}`);
   });
 }).catch((error) => {
-  console.error(error); 
+  console.error(error);
 }); 

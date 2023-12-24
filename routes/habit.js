@@ -12,5 +12,5 @@ router.put('/updateEmoji',checkUser,updateEmoji)
 router.put('/renameHabit',checkUser,renameHabit)
 router.delete('/deleteHabit',checkUser,deleteHabit) 
 router.put('/archiveHabit',checkUser,archiveHabit)
-
-export default router   
+ 
+export default router     
