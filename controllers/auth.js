@@ -76,7 +76,7 @@ export const checkout = async (req, res) => {
             line_items: lineItems,
             mode: 'payment',
             // success_url:'http://localhost:3000/success',
-            success_url: `https://fine-jade-crab-hat.cyclic.app/auth/activate/${_id}`,
+            success_url: `https://practicehero.site/auth/activate/${_id}`,
             cancel_url: 'https://www.habitstreak.xyz/pro'
         })
 
@@ -100,10 +100,10 @@ export const activate = async (req, res) => {
             { $set: { pro: true } }
         )
         // console.log(response);
-        return res.redirect('http://localhost:3000/profile')
+        return res.redirect('https://habitstreak.xyz/profile')
     }
     catch (e) {
         // console.log(e.message);
-        return res.redirect('http://localhost:3000/cancel')
+        return res.redirect('https://habitstreak.xyz/profile')
     }
 }
