@@ -9,6 +9,7 @@ import Habits from './models/Habits.js';
 // routes
 import authRoutes from './routes/auth.js'
 import habitRoutes from './routes/habit.js'
+import generalRoutes from './routes/general.js'
 
 dotenv.config();
 
@@ -25,12 +26,13 @@ app.use((req, res, next) => {
   console.log(req.path, req.method);
   // setTimeout(() => { 
   next();
-  // }, 200); 
+  // }, 4000); 
 });
 
 
 app.use('/auth', authRoutes)
 app.use('/habit', habitRoutes)
+app.use('/general',generalRoutes)
 
 // 404 handler
 app.get('*', (req, res) => {

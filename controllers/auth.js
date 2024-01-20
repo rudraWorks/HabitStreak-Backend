@@ -86,7 +86,7 @@ export const checkout = async (req, res) => {
     }
     catch (e) {
         return res.send(JSON.stringify({
-            url: 'http://localhost:3000/pro'
+            url: 'https://habitstreak.xyz/pro'
         }))
     }
 }
