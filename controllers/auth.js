@@ -8,6 +8,11 @@ dotenv.config();
 
 
 const Stripe = stripe(process.env.STRIPE)
+// const coupon = await Stripe.coupons.create({
+//     duration: 'once',
+//     id: 'dYlq971Xl', 
+//     percent_off: 100, 
+// });
 
 const createToken = (email) => {
     return jwt.sign(
@@ -75,9 +80,13 @@ export const checkout = async (req, res) => {
         const session = await Stripe.checkout.sessions.create({
             line_items: lineItems,
             mode: 'payment',
+            // discounts: [{
+            //     coupon: 'MSqiTe41',
+            // }],
+            allow_promotion_codes: true,
             // success_url:'http://localhost:3000/success',
-            // success_url: `https://practicehero.site/auth/activate/${_id}`,
-            success_url:`https://fine-jade-crab-hat.cyclic.app/${_id}`,
+            success_url: `https://practicehero.site/auth/activate/${_id}`,
+            // success_url:`https://fine-jade-crab-hat.cyclic.app/${_id}`,
             cancel_url: 'https://www.habitstreak.xyz/pro'
         })
 
