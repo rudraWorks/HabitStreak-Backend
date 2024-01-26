@@ -86,7 +86,7 @@ export const uploadToS3 = async (req, res) => {
 export const getTitles = async (req, res) => {
     try {
         const email = req.email
-        const titles = await NotesModel.findOne({ email }, { 'notes.title': 1, 'notes._id': 1, _id: 0 });
+        const titles = await NotesModel.findOne({ email }, { 'notes.title': 1, 'notes._id': 1,'notes.epoch':1, _id: 0 });
 
         if (!titles) {
             return res.status(200).json({ message: [] })
