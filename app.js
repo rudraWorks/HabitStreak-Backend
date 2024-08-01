@@ -53,22 +53,6 @@ const connectDB = async () => {
   }
 };
 
-const temp = async () => {
-  let epoch = new Date('11/02/2023').getTime()
-  for (let i = 1; i <= 3; ++i) {
-    const t = await Habits.updateOne(
-      { email:'srudra754@gmail.com', 'habits.name': 'read book' },
-      { $addToSet: { 'habits.$[elem].calendar': { epoch, value:generateRandom(0,8) } } },
-      { arrayFilters: [{ 'elem.name': 'read book' }] }
-    );
-    epoch+=1000*60*60*24
-      console.log(new Date(epoch))
-  }
-  // const t = await Users.find({})
-  // console.log(t);
-  console.log('done');
-}
-// temp()
  
 function generateRandom(min = 0, max = 100) {
 
