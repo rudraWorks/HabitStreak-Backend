@@ -85,7 +85,7 @@ export const checkout = async (req, res) => {
             // }],
             allow_promotion_codes: true,
             // success_url:'http://localhost:3000/success',
-            success_url: `https://practicehero.site/auth/activate/${_id}`,
+            success_url: `https://habit-backend-of8p.onrender.com/auth/activate/${_id}`,
             // success_url:`https://fine-jade-crab-hat.cyclic.app/${_id}`,
             cancel_url: 'https://www.habitstreak.xyz/pro'
         })
