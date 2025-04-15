@@ -110,10 +110,10 @@ export const activate = async (req, res) => {
             { $set: { pro: true } }
         )
         // console.log(response);
-        return res.redirect('https://habitstreak.xyz/profile')
+        return res.redirect('https://habitstreak.vercel.app/profile')
     }
     catch (e) {
         // console.log(e.message);
-        return res.redirect('https://habitstreak.xyz/profile')
+        return res.redirect('https://habitstreak.vercel.app/profile')
     }
 }
